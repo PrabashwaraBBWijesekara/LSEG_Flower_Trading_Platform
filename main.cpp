@@ -34,6 +34,7 @@ int main() {
         return 1;
     }
     std::string line;
+    std::cout<<"cdmnjrvnh"<<std::endl;
 
     std::getline(file, line);
 
