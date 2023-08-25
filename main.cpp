@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
+#include <sstream>
 #include <sstream>
 #include <vector>
 
@@ -17,11 +19,6 @@ public:
     }
 };
 
-
-// class OrderBook{
-//     OrderBook("ex7.csv"){};
-// };
-
 std::vector<std::string> split(const std::string &s, char delimiter) {
     std::vector<std::string> tokens;
     std::string token;
@@ -32,6 +29,9 @@ std::vector<std::string> split(const std::string &s, char delimiter) {
     return tokens;
 }
 
+// class OrderBook{
+//     OrderBook("ex7.csv"){};
+// };
 
 
 
@@ -54,14 +54,8 @@ int main()
             cells.push_back(cell);
         }
 
-
-        // Now you can process the values in 'cells' for the current line
-        for (const std::string& value : cells) {
-            std::cout << value << " ";
-            OrderBookEntry
-        }
-        std::cout << std::endl;
-    }
+    std::cout << line << std::endl;
+    
     file.close();
     
 
