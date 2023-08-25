@@ -1,2 +1,2 @@
-# LSEG_Flower_Trading_Platform
+# LSEG_Flower_Trading_Platform_Project
 Flower trading platform
