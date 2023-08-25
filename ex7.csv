@@ -1,25 +1,11 @@
-<<<<<<< HEAD
-﻿aa13,Rose,1,100,55
+aa13,Rose,1,100,55
 aa14,Rose,1,100,65
-aa15,Lavender,2,400,1
-aa16,Tulip,1,100,55
-aa17,Orchid,1,100,45
-aa18,Orchid,1,100,45
-aa19,Orchid,2,200,65
-aa20,Orchid,2,400,45
-aa21,Orchid,1,100,55
-aa22,Orchid,1,250,45
-aa23,Orchid,1,100,22
-=======
-﻿aa13,Rose,1,100,55
-aa14,Rose,1,100,65
-aa15,Lavender,2,400,1
-aa16,Tulip,1,100,55
-aa17,Orchid,1,100,45
-aa18,Orchid,1,100,45
-aa19,Orchid,2,200,65
-aa20,Orchid,2,400,45
-aa21,Orchid,1,100,55
-aa22,Orchid,1,250,45
-aa23,Orchid,1,100,22
->>>>>>> f0b77fe5aa6914a89eba4045fdef27b71d8fcb56
+aa15,Rose,2,400,1
+aa16,Rose,1,100,55
+aa17,Rose,1,100,45
+aa18,Rose,1,100,45
+aa19,Rose,2,200,65
+aa20,Rose,2,400,45
+aa21,Rose,1,100,55
+aa22,Rose,1,250,45
+aa23,Rose,1,100,22
