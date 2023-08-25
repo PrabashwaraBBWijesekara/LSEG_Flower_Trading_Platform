@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
+#include <vector>
 
 class OrderBookEntry {
 public:
@@ -20,6 +22,17 @@ public:
 //     OrderBook("ex7.csv"){};
 // };
 
+std::vector<std::string> split(const std::string &s, char delimiter) {
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(s);
+    while (std::getline(tokenStream, token, delimiter)) {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
+
+
 
 
 int main()
@@ -29,13 +42,28 @@ int main()
         std::cerr << "Could not open the file." << std::endl;
         return 1;
     }
+    //-------------------------------------------------------------
     std::string line;
 
-    std::getline(file, line);
+    while (std::getline(file, line)) {
+        std::istringstream ss(line);
+        std::string cell;
+        std::vector<std::string> cells; // Store CSV values for the current line
 
-    std::cout << line << std::endl;
-    
+        while (std::getline(ss, cell, ',')) {
+            cells.push_back(cell);
+        }
+
+
+        // Now you can process the values in 'cells' for the current line
+        for (const std::string& value : cells) {
+            std::cout << value << " ";
+            OrderBookEntry
+        }
+        std::cout << std::endl;
+    }
     file.close();
+    
 
     return 0;
 }

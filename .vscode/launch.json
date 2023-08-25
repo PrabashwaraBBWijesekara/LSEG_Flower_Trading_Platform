@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "e:/semester 5/lseg/github/LSEG_Flower_Trading_Platform",
-      "program": "e:/semester 5/lseg/github/LSEG_Flower_Trading_Platform/build/Debug/outDebug",
+      "cwd": "c:/Users/User/Documents/GitHub/LSEG_Flower_Trading_Platform",
+      "program": "c:/Users/User/Documents/GitHub/LSEG_Flower_Trading_Platform/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
