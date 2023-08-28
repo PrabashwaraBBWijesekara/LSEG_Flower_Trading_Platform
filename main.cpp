@@ -79,6 +79,7 @@ int main()
     }
     
     std::string line;
+    std::cout<<"cdmnjrvnh"<<std::endl;
 
     OrderBook Rose;
     OrderBook Lavender;
