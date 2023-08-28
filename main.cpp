@@ -15,6 +15,7 @@ public:
     int side;
     double price;
     int quantity;
+    std::string orderID;
     OrderBookEntry() {
     }
 
@@ -59,7 +60,7 @@ std::string getTimestamp() {
     std::time_t currentTimeT = std::chrono::system_clock::to_time_t(currentTime);
     std::tm localTime = *std::localtime(&currentTimeT);
     std::ostringstream timestampStream;
-    timestampStream << std::put_time(&localTime, "%Y%m%d-%H%M%S") << "." << std::setfill('0') << std::setw(4) << currentTime.time_since_epoch() / std::chrono::milliseconds(1) % 1000 ;
+    timestampStream << std::put_time(&localTime, "%Y%m%d-%H%M%S") << "." << std::setfill('0') << std::setw(3) << currentTime.time_since_epoch() / std::chrono::milliseconds(1) % 1000 ;
     std::string timestamp = timestampStream.str();
     return timestamp;
 }
@@ -67,7 +68,7 @@ std::string getTimestamp() {
 int main()
 {
     // reading file
-    std::ifstream file("ex7_1.csv");
+    std::ifstream file("ex7.csv");
 
     //writing file
     std::string file_path = "ex6.csv";
@@ -79,20 +80,25 @@ int main()
     }
     
     std::string line;
-    std::cout<<"cdmnjrvnh"<<std::endl;
 
     OrderBook Rose;
     OrderBook Lavender;
     OrderBook Lotus;
     OrderBook Tulip;
     OrderBook Orchid;
+
+   int IDint=0;
    
     while (std::getline(file, line)) {
 
-        //time settings
         
+        //rejected reason 
+        std::string reject = "NA";
 
-
+        
+        
+        
+        //iterating through each line
         std::istringstream ss(line);
         std::string cell;
         std::vector<std::string> cells; // Store CSV values for the current line
@@ -101,6 +107,12 @@ int main()
             cells.push_back(cell);
         }
         OrderBookEntry orderBookEntry;
+
+
+       
+
+        // checking if the line is valid
+        std::ostringstream errorMsgStream;
         try
         {
             orderBookEntry.ID = cells[0];
@@ -111,8 +123,11 @@ int main()
         }
         catch(const std::exception& e)
         {
-            std::cerr << "Invalid input" << '\n';
+            continue;
         }
+        // adding the corresponding orderID to the orderBookEntry
+        IDint++;
+        orderBookEntry.orderID="Ord"+std::to_string(IDint);
         
         
 
@@ -137,10 +152,36 @@ int main()
         }
         else{
             std::cout << "Reject" << std::endl;
-            file_out <<orderBookEntry.ID<<","<<" "<<","<<orderBookEntry.side<<","<< "pfill_2"<<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<std::endl;
+            std::string timestamp = getTimestamp();
+            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<" "<<","<<orderBookEntry.side<<","<< "Rejected"<<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid Instrument"<<","<<timestamp<<std::endl;
             continue;
 
         }
+        if (cells[0].substr(0, 2) != "aa"){
+            reject="Rejected";
+            std::string timestamp = getTimestamp();
+            file_out <<orderBookEntry.orderID<<","<<" "<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< reject <<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid ID"<<","<<timestamp<<std::endl;
+            continue;
+        }
+        if (orderBookEntry.side != 1 || orderBookEntry.side != 2){
+            reject="Rejected";
+            std::string timestamp = getTimestamp();
+            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<" "<<","<< reject <<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid Side"<<","<<timestamp<<std::endl;
+            continue;
+        }
+        if (orderBookEntry.quantity || orderBookEntry.quantity % 10==0 || orderBookEntry.quantity < 0 || orderBookEntry.quantity > 1000){
+            reject="Rejected";
+            std::string timestamp = getTimestamp();
+            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< reject <<","<<" "<<","<<orderBookEntry.price<<","<<"Invalid Quantity"<<","<<timestamp<<std::endl;
+            continue;
+        }
+        if (orderBookEntry.price<0){
+            reject="Rejected";
+            std::string timestamp = getTimestamp();
+            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< reject <<","<<orderBookEntry.quantity<<","<<" "<<","<<"Invalid Price"<<","<<timestamp<<std::endl;
+            continue;
+        }
+
         currentOrderBook->orderBook.push_back(orderBookEntry); 
         
         
@@ -162,7 +203,9 @@ int main()
             for (OrderBookEntry &sellOrder :currentOrderBook->sell) {
                 if (buyOrder.price >= sellOrder.price) {
                     if (buyOrder.quantity > sellOrder.quantity && sellOrder.quantity != 0) 
+
                     {
+                        int temp =sellOrder.quantity;
                         buyOrder.quantity -= sellOrder.quantity;
                         sellOrder.quantity = 0;
                     
@@ -176,12 +219,14 @@ int main()
 
 
                         //print to .csv file
-                        file_out <<timestamp<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "pfill_1"<<","<<orderBookEntry.quantity<<","<<buyOrder.price<<std::endl;
-                        file_out <<timestamp<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "filled "<<","<<orderBookEntry.quantity<<","<<buyOrder.price<<std::endl;
+                        file_out <<buyOrder.orderID<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "pfill_1"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
+                        file_out <<sellOrder.orderID<<","<<sellOrder.ID<<","<<sellOrder.instrument<<","<<sellOrder.side<<","<< "filled "<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
 
                         matchFound = true;  // Set matchFound to true when a match occurs
                     } 
                     else if (buyOrder.quantity < sellOrder.quantity && buyOrder.quantity != 0) {
+
+                        int temp =buyOrder.quantity;
                         sellOrder.quantity -= buyOrder.quantity;
                         buyOrder.quantity = 0;
                         //add time
@@ -194,8 +239,8 @@ int main()
                         std::cout << "filled " <<buyOrder.ID<<" "<<buyOrder.instrument<<std::endl;
 
                         //print to .csv file
-                        file_out <<timestamp<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "pfill_2"<<","<<orderBookEntry.quantity<<","<<buyOrder.price<<std::endl;
-                        file_out <<timestamp<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "filled"<<","<<orderBookEntry.quantity<<","<<buyOrder.price<<std::endl;
+                        file_out <<sellOrder.orderID<<","<<sellOrder.ID<<","<<sellOrder.instrument<<","<<sellOrder.side<<","<< "pfill_2"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
+                        file_out <<buyOrder.orderID<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "filled"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
 
                         matchFound = true;  // Set matchFound to true when a match occurs
                     } 
@@ -206,18 +251,19 @@ int main()
                         //add time
                         std::string timestamp = getTimestamp();
                         
-
+                        int temp =buyOrder.quantity;
 
 
                         std::cout << "filled " <<buyOrder.ID <<" "<<buyOrder.instrument<<std::endl;
                         std::cout << "filled " <<sellOrder.ID <<" "<<buyOrder.instrument<<std::endl;
 
                         //print to .csv file
-                        file_out <<timestamp<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "filled"<<","<<orderBookEntry.quantity<<","<<buyOrder.price<<std::endl;
-                        file_out <<timestamp<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "filled"<<","<<orderBookEntry.quantity<<","<<buyOrder.price<<std::endl;
+                        file_out <<buyOrder.orderID<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "filled"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
+                        file_out <<buyOrder.orderID<<","<<sellOrder.ID<<","<<sellOrder.instrument<<","<<sellOrder.side<<","<< "filled"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
 
                         matchFound = true;  // Set matchFound to true when a match occurs
                     }
+                    
                 }
             }
         }
@@ -229,7 +275,7 @@ int main()
 
             std::cout<< "New "<< orderBookEntry.ID <<" "<<orderBookEntry.instrument<< std::endl;
             //print to .csv file
-            file_out <<timestamp<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< "new"<<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<std::endl;
+            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< "new"<<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<reject<<","<<timestamp<<std::endl;
             } 
     }
         //std::cout << line << std::endl;
