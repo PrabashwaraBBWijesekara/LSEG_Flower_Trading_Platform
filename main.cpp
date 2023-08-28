@@ -128,11 +128,31 @@ int main()
         // adding the corresponding orderID to the orderBookEntry
         IDint++;
         orderBookEntry.orderID="Ord"+std::to_string(IDint);
+
+         if (cells[0].substr(0, 2) != "aa"){
+            reject="Rejected";
+            std::string timestamp = getTimestamp();
+            file_out <<orderBookEntry.orderID<<","<<"-"<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< reject <<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid ID"<<","<<timestamp<<std::endl;
+            continue;
+        }
+        else if ( orderBookEntry.quantity % 10!=0 || orderBookEntry.quantity < 0 || orderBookEntry.quantity > 1000){
+            reject="Rejected";
+            std::string timestamp = getTimestamp();
+            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< reject <<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid Quantity"<<","<<timestamp<<std::endl;
+            continue;
+        }
+        else if (orderBookEntry.price<0){
+            reject="Rejected";
+            std::string timestamp = getTimestamp();
+            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< reject <<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid Price"<<","<<timestamp<<std::endl;
+            continue;
+        }
+
         
         
 
-        OrderBook *currentOrderBook = nullptr;
         
+        OrderBook *currentOrderBook = nullptr;
         if(cells[1] == "Rose"){
 
             currentOrderBook = &Rose;
@@ -153,34 +173,14 @@ int main()
         else{
             std::cout << "Reject" << std::endl;
             std::string timestamp = getTimestamp();
-            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<" "<<","<<orderBookEntry.side<<","<< "Rejected"<<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid Instrument"<<","<<timestamp<<std::endl;
+            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<"-"<<","<<orderBookEntry.side<<","<< "Rejected"<<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid Instrument"<<","<<timestamp<<std::endl;
             continue;
 
         }
-        if (cells[0].substr(0, 2) != "aa"){
-            reject="Rejected";
-            std::string timestamp = getTimestamp();
-            file_out <<orderBookEntry.orderID<<","<<" "<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< reject <<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid ID"<<","<<timestamp<<std::endl;
-            continue;
-        }
-        if (orderBookEntry.side != 1 || orderBookEntry.side != 2){
-            reject="Rejected";
-            std::string timestamp = getTimestamp();
-            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<" "<<","<< reject <<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid Side"<<","<<timestamp<<std::endl;
-            continue;
-        }
-        if (orderBookEntry.quantity || orderBookEntry.quantity % 10==0 || orderBookEntry.quantity < 0 || orderBookEntry.quantity > 1000){
-            reject="Rejected";
-            std::string timestamp = getTimestamp();
-            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< reject <<","<<" "<<","<<orderBookEntry.price<<","<<"Invalid Quantity"<<","<<timestamp<<std::endl;
-            continue;
-        }
-        if (orderBookEntry.price<0){
-            reject="Rejected";
-            std::string timestamp = getTimestamp();
-            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< reject <<","<<orderBookEntry.quantity<<","<<" "<<","<<"Invalid Price"<<","<<timestamp<<std::endl;
-            continue;
-        }
+       
+    
+        
+        
 
         currentOrderBook->orderBook.push_back(orderBookEntry); 
         
@@ -190,6 +190,10 @@ int main()
         } else if (orderBookEntry.side == 2) {
             currentOrderBook->sell.push_back(orderBookEntry);
         }
+        else{reject="Rejected";
+            std::string timestamp = getTimestamp();
+            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<" "<<","<< reject <<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid Side"<<","<<timestamp<<std::endl;
+            continue;}
 
         std::sort(currentOrderBook->buy.begin(), currentOrderBook->buy.end(), compareByPriceDs);
         std::sort(currentOrderBook->sell.begin(), currentOrderBook->sell.end(), compareByPriceAs);
