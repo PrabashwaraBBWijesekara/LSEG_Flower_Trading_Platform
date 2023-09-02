@@ -34,7 +34,7 @@ std::string getTimestamp() {
 int main()
 {
     // reading file
-    std::ifstream file("ex7_1.csv");
+    std::ifstream file("ex7.csv");
 
     //writing file
     std::ofstream file_out("ex6.csv", std::ios::app);
@@ -46,35 +46,25 @@ int main()
     
     std::string line;
 
-    OrderBook Rose;
-    OrderBook Lavender;
-    OrderBook Lotus;
-    OrderBook Tulip;
-    OrderBook Orchid;
-
+    OrderBook Rose,Lavender,Lotus,Tulip,Orchid;
+    
    int IDint=0;
    
     while (std::getline(file, line)) {
 
-        
         //rejected reason 
         std::string reject = "NA";
 
-        
-        
-        
         //iterating through each line
         std::istringstream ss(line);
         std::string cell;
         std::vector<std::string> cells; // Store CSV values for the current line
 
+        
         while (std::getline(ss, cell, ',')) {
             cells.push_back(cell);
         }
         OrderBookEntry orderBookEntry;
-
-
-       
 
         // checking if the line is valid
         std::ostringstream errorMsgStream;
@@ -90,11 +80,12 @@ int main()
         {
             continue;
         }
+        
         // adding the corresponding orderID to the orderBookEntry
         IDint++;
         orderBookEntry.orderID="Ord"+std::to_string(IDint);
 
-         if (cells[0].substr(0, 2) != "aa"){
+        if (cells[0].substr(0, 2) != "aa"){
             reject="Rejected";
             std::string timestamp = getTimestamp();
             file_out <<orderBookEntry.orderID<<","<<"-"<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< reject <<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid ID"<<","<<timestamp<<std::endl;
@@ -113,15 +104,10 @@ int main()
             continue;
         }
 
-        
-        
-
-        
+        // selecting current orderbook
         OrderBook *currentOrderBook = nullptr;
         if(cells[1] == "Rose"){
-
-            currentOrderBook = &Rose;
-            
+            currentOrderBook = &Rose;  
         }
         else if(cells[1] == "Lavender"){
             currentOrderBook = &Lavender;
@@ -136,21 +122,14 @@ int main()
             currentOrderBook = &Orchid;
         }
         else{
-            std::cout << "Reject" << std::endl;
             std::string timestamp = getTimestamp();
             file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<"-"<<","<<orderBookEntry.side<<","<< "Rejected"<<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid Instrument"<<","<<timestamp<<std::endl;
             continue;
-
         }
        
-    
-        
-        
-
         currentOrderBook->orderBook.push_back(orderBookEntry); 
         
-        
-         if (orderBookEntry.side == 1) {
+        if (orderBookEntry.side == 1) {
             currentOrderBook->buy.push_back(orderBookEntry);
         } else if (orderBookEntry.side == 2) {
             currentOrderBook->sell.push_back(orderBookEntry);
@@ -160,10 +139,13 @@ int main()
             file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<" "<<","<< reject <<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<"Invalid Side"<<","<<timestamp<<std::endl;
             continue;}
 
-        std::sort(currentOrderBook->buy.begin(), currentOrderBook->buy.end(), compareByPriceDs);
-        std::sort(currentOrderBook->sell.begin(), currentOrderBook->sell.end(), compareByPriceAs);
-
-
+        //sorting the orderbook
+        if(orderBookEntry.side==1){
+            std::sort(currentOrderBook->buy.begin(), currentOrderBook->buy.end(), compareByPriceDs);
+        }
+        else if(orderBookEntry.side==2){
+            std::sort(currentOrderBook->sell.begin(), currentOrderBook->sell.end(), compareByPriceAs);
+        }
 
         //matching algorithm
         bool matchFound = false;  // Initialize matchFound as false
