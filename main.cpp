@@ -7,33 +7,9 @@
 #include <chrono>
 #include <iomanip>
 
-// OrderBookEntry class
-class OrderBookEntry {
-public:
-    std::string ID;
-    std::string instrument;
-    int side;
-    double price;
-    int quantity;
-    std::string orderID;
-    OrderBookEntry() {
-    }
+#include "OrderBookEntry.h"
+#include "OrderBook.h"
 
-    OrderBookEntry(std::string ID, std::string instrument, int side, double price, int quantity)
-        : ID(ID), instrument(instrument), side(side), price(price), quantity(quantity) {
-    }
-};
-
-// OrderBook class
-class OrderBook {
-    public:
-
-    std::vector<OrderBookEntry> orderBook;
-    std::vector<OrderBookEntry> buy;
-    std::vector<OrderBookEntry> sell;
-    OrderBook(){}
-  
-};
 
 // to sort buy book by highest price
 bool compareByPriceAs(const OrderBookEntry a, const OrderBookEntry b) {
@@ -61,8 +37,7 @@ int main()
     std::ifstream file("ex7_1.csv");
 
     //writing file
-    std::string file_path = "ex6.csv";
-    std::ofstream file_out(file_path, std::ios::app);
+    std::ofstream file_out("ex6.csv", std::ios::app);
 
     if (!file.is_open()) {
         std::cerr << "Could not open the file." << std::endl;
