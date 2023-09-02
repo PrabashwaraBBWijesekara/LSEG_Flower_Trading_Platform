@@ -45,16 +45,6 @@ bool compareByPriceDs(const OrderBookEntry a, const OrderBookEntry b) {
     return a.price > b.price;
 }
 
-// to split the string by delimiter
-std::vector<std::string> split(const std::string &s, char delimiter) {
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream tokenStream(s);
-    while (std::getline(tokenStream, token, delimiter)) {
-        tokens.push_back(token);
-    }
-    return tokens;
-}
 std::string getTimestamp() {
     auto currentTime = std::chrono::system_clock::now();
     std::time_t currentTimeT = std::chrono::system_clock::to_time_t(currentTime);
@@ -68,7 +58,7 @@ std::string getTimestamp() {
 int main()
 {
     // reading file
-    std::ifstream file("ex7.csv");
+    std::ifstream file("ex7_1.csv");
 
     //writing file
     std::string file_path = "ex6.csv";
@@ -216,14 +206,8 @@ int main()
                         //add time
                         std::string timestamp = getTimestamp();
                         
-
-
-                        std::cout << "pfill_1 "<<buyOrder.ID<<" "<<buyOrder.instrument<<std::endl;
-                        std::cout << "filled " <<sellOrder.ID <<" "<<buyOrder.instrument<<std::endl;
-
-
                         //print to .csv file
-                        file_out <<buyOrder.orderID<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "pfill_1"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
+                        file_out <<buyOrder.orderID<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "pfill"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
                         file_out <<sellOrder.orderID<<","<<sellOrder.ID<<","<<sellOrder.instrument<<","<<sellOrder.side<<","<< "filled "<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
 
                         matchFound = true;  // Set matchFound to true when a match occurs
@@ -233,17 +217,12 @@ int main()
                         int temp =buyOrder.quantity;
                         sellOrder.quantity -= buyOrder.quantity;
                         buyOrder.quantity = 0;
+                        
                         //add time
                         std::string timestamp = getTimestamp();
                         
-                        
-                        
-                        
-                        std::cout << "pfill_2 " <<sellOrder.ID <<" "<<buyOrder.instrument<<std::endl;
-                        std::cout << "filled " <<buyOrder.ID<<" "<<buyOrder.instrument<<std::endl;
-
                         //print to .csv file
-                        file_out <<sellOrder.orderID<<","<<sellOrder.ID<<","<<sellOrder.instrument<<","<<sellOrder.side<<","<< "pfill_2"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
+                        file_out <<sellOrder.orderID<<","<<sellOrder.ID<<","<<sellOrder.instrument<<","<<sellOrder.side<<","<< "pfill"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
                         file_out <<buyOrder.orderID<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "filled"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
 
                         matchFound = true;  // Set matchFound to true when a match occurs
@@ -256,10 +235,6 @@ int main()
                         std::string timestamp = getTimestamp();
                         
                         int temp =buyOrder.quantity;
-
-
-                        std::cout << "filled " <<buyOrder.ID <<" "<<buyOrder.instrument<<std::endl;
-                        std::cout << "filled " <<sellOrder.ID <<" "<<buyOrder.instrument<<std::endl;
 
                         //print to .csv file
                         file_out <<buyOrder.orderID<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "filled"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
@@ -277,7 +252,6 @@ int main()
             //add time
             std::string timestamp = getTimestamp();  
 
-            std::cout<< "New "<< orderBookEntry.ID <<" "<<orderBookEntry.instrument<< std::endl;
             //print to .csv file
             file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< "new"<<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<reject<<","<<timestamp<<std::endl;
             } 
