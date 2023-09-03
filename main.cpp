@@ -37,7 +37,7 @@ int main()
     std::ifstream file("Bigdataset.csv");
 
     //writing file
-    std::ofstream file_out("ex6.csv", std::ios::app);
+    std::ofstream file_out("execution_rep.csv", std::ios::app);
 
     if (!file.is_open()) {
         std::cerr << "Could not open the file." << std::endl;
