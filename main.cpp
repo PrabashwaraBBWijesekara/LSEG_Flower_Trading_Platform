@@ -34,7 +34,7 @@ std::string getTimestamp() {
 int main()
 {
     // reading file
-    std::ifstream file("ex7.csv");
+    std::ifstream file("Bigdataset.csv");
 
     //writing file
     std::ofstream file_out("ex6.csv", std::ios::app);
@@ -150,53 +150,83 @@ int main()
         //matching algorithm
         bool matchFound = false;  // Initialize matchFound as false
 
-        for (OrderBookEntry &buyOrder :currentOrderBook->buy) {
-            for (OrderBookEntry &sellOrder :currentOrderBook->sell) {
-                if (buyOrder.price >= sellOrder.price) {
-                    if (buyOrder.quantity > sellOrder.quantity && sellOrder.quantity != 0) 
+        for (int i = 0; i < currentOrderBook->buy.size(); ++i) {
+            for (int j = 0; j < currentOrderBook->sell.size(); ++j) {
+                if (currentOrderBook->buy[i].price >= currentOrderBook->sell[j].price) {
+                    if (currentOrderBook->buy[i].quantity > currentOrderBook->sell[j].quantity && currentOrderBook->sell[j].quantity != 0 ) 
 
                     {
-                        int temp =sellOrder.quantity;
-                        buyOrder.quantity -= sellOrder.quantity;
-                        sellOrder.quantity = 0;
+                        int temp =currentOrderBook->sell[j].quantity;
+                        currentOrderBook->buy[i].quantity -= currentOrderBook->sell[j].quantity;
+                        currentOrderBook->sell[j].quantity = 0;
                     
                         //add time
                         std::string timestamp = getTimestamp();
                         
                         //print to .csv file
-                        file_out <<buyOrder.orderID<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "pfill"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
-                        file_out <<sellOrder.orderID<<","<<sellOrder.ID<<","<<sellOrder.instrument<<","<<sellOrder.side<<","<< "filled "<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
-
+                        if(stoi(currentOrderBook->buy[i].orderID.substr(3,-1))>stoi(currentOrderBook->sell[j].orderID.substr(3,-1))){
+                            file_out <<currentOrderBook->buy[i].orderID<<","<<currentOrderBook->buy[i].ID<<","<<currentOrderBook->buy[i].instrument<<","<<currentOrderBook->buy[i].side<<","<< "PFill"<<","<<temp<<","<<currentOrderBook->sell[i].price<<","<<reject<<","<<timestamp<<std::endl;
+                            file_out <<currentOrderBook->sell[j].orderID<<","<<currentOrderBook->sell[j].ID<<","<<currentOrderBook->sell[j].instrument<<","<<currentOrderBook->sell[j].side<<","<< "Fill"<<","<<temp<<","<<currentOrderBook->sell[i].price<<","<<reject<<","<<timestamp<<std::endl;
+                        }
+                        else{
+                            file_out <<currentOrderBook->sell[j].orderID<<","<<currentOrderBook->sell[j].ID<<","<<currentOrderBook->sell[j].instrument<<","<<currentOrderBook->sell[j].side<<","<< "Fill"<<","<<temp<<","<<currentOrderBook->buy[i].price<<","<<reject<<","<<timestamp<<std::endl;
+                            file_out <<currentOrderBook->buy[i].orderID<<","<<currentOrderBook->buy[i].ID<<","<<currentOrderBook->buy[i].instrument<<","<<currentOrderBook->buy[i].side<<","<< "PFill"<<","<<temp<<","<<currentOrderBook->buy[i].price<<","<<reject<<","<<timestamp<<std::endl;
+                        }
+                        
+                        
+                        //erase the order from the orderbook
+                        currentOrderBook->sell.erase(currentOrderBook->sell.begin()+j);
+                        
                         matchFound = true;  // Set matchFound to true when a match occurs
                     } 
-                    else if (buyOrder.quantity < sellOrder.quantity && buyOrder.quantity != 0) {
+                    else if (currentOrderBook->buy[i].quantity < currentOrderBook->sell[j].quantity && currentOrderBook->buy[i].quantity != 0 ) {
 
-                        int temp =buyOrder.quantity;
-                        sellOrder.quantity -= buyOrder.quantity;
-                        buyOrder.quantity = 0;
+                        int temp =currentOrderBook->buy[i].quantity;
+                        currentOrderBook->sell[j].quantity -= currentOrderBook->buy[i].quantity;
+                        currentOrderBook->buy[i].quantity = 0;
                         
                         //add time
                         std::string timestamp = getTimestamp();
                         
                         //print to .csv file
-                        file_out <<sellOrder.orderID<<","<<sellOrder.ID<<","<<sellOrder.instrument<<","<<sellOrder.side<<","<< "pfill"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
-                        file_out <<buyOrder.orderID<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "filled"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
+                        if(stoi(currentOrderBook->buy[i].orderID.substr(3,-1))>stoi(currentOrderBook->sell[j].orderID.substr(3,-1))){
+                            file_out <<currentOrderBook->buy[i].orderID<<","<<currentOrderBook->buy[i].ID<<","<<currentOrderBook->buy[i].instrument<<","<<currentOrderBook->buy[i].side<<","<< "Fill"<<","<<temp<<","<<currentOrderBook->sell[i].price<<","<<reject<<","<<timestamp<<std::endl;
+                            file_out <<currentOrderBook->sell[j].orderID<<","<<currentOrderBook->sell[j].ID<<","<<currentOrderBook->sell[j].instrument<<","<<currentOrderBook->sell[j].side<<","<< "PFill"<<","<<temp<<","<<currentOrderBook->sell[i].price<<","<<reject<<","<<timestamp<<std::endl;
+                        }
+                        else{
+                            file_out <<currentOrderBook->sell[j].orderID<<","<<currentOrderBook->sell[j].ID<<","<<currentOrderBook->sell[j].instrument<<","<<currentOrderBook->sell[j].side<<","<< "PFill"<<","<<temp<<","<<currentOrderBook->buy[i].price<<","<<reject<<","<<timestamp<<std::endl;
+                            file_out <<currentOrderBook->buy[i].orderID<<","<<currentOrderBook->buy[i].ID<<","<<currentOrderBook->buy[i].instrument<<","<<currentOrderBook->buy[i].side<<","<< "Fill"<<","<<temp<<","<<currentOrderBook->buy[i].price<<","<<reject<<","<<timestamp<<std::endl;
+                        }
+
+                        //erase the order from the orderbook
+                        currentOrderBook->buy.erase(currentOrderBook->buy.begin()+i);
 
                         matchFound = true;  // Set matchFound to true when a match occurs
                     } 
-                    else if (buyOrder.quantity == sellOrder.quantity && buyOrder.quantity != 0 && sellOrder.quantity != 0) {
-                        buyOrder.quantity = 0;
-                        sellOrder.quantity = 0;
+                    else if (currentOrderBook->buy[i].quantity == currentOrderBook->sell[j].quantity && currentOrderBook->buy[i].quantity != 0) {
+                        
 
                         //add time
                         std::string timestamp = getTimestamp();
                         
-                        int temp =buyOrder.quantity;
+                        int temp =currentOrderBook->buy[i].quantity;
 
                         //print to .csv file
-                        file_out <<buyOrder.orderID<<","<<buyOrder.ID<<","<<buyOrder.instrument<<","<<buyOrder.side<<","<< "filled"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
-                        file_out <<buyOrder.orderID<<","<<sellOrder.ID<<","<<sellOrder.instrument<<","<<sellOrder.side<<","<< "filled"<<","<<temp<<","<<buyOrder.price<<","<<reject<<","<<timestamp<<std::endl;
-
+                        if(stoi(currentOrderBook->buy[i].orderID.substr(3,-1))>stoi(currentOrderBook->sell[j].orderID.substr(3,-1))){
+                            file_out <<currentOrderBook->buy[i].orderID<<","<<currentOrderBook->buy[i].ID<<","<<currentOrderBook->buy[i].instrument<<","<<currentOrderBook->buy[i].side<<","<< "Fill"<<","<<temp<<","<<currentOrderBook->sell[i].price<<","<<reject<<","<<timestamp<<std::endl;
+                            file_out <<currentOrderBook->sell[j].orderID<<","<<currentOrderBook->sell[j].ID<<","<<currentOrderBook->sell[j].instrument<<","<<currentOrderBook->sell[j].side<<","<< "Fill"<<","<<temp<<","<<currentOrderBook->sell[i].price<<","<<reject<<","<<timestamp<<std::endl;
+                        }
+                        else{
+                            file_out <<currentOrderBook->sell[j].orderID<<","<<currentOrderBook->sell[j].ID<<","<<currentOrderBook->sell[j].instrument<<","<<currentOrderBook->sell[j].side<<","<< "Fill"<<","<<temp<<","<<currentOrderBook->buy[i].price<<","<<reject<<","<<timestamp<<std::endl;
+                            file_out <<currentOrderBook->buy[i].orderID<<","<<currentOrderBook->buy[i].ID<<","<<currentOrderBook->buy[i].instrument<<","<<currentOrderBook->buy[i].side<<","<< "Fill"<<","<<temp<<","<<currentOrderBook->buy[i].price<<","<<reject<<","<<timestamp<<std::endl;
+                        }
+                        currentOrderBook->buy[i].quantity = 0;
+                        currentOrderBook->sell[j].quantity = 0;
+                        
+                        //erase the order from the orderbook
+                        currentOrderBook->buy.erase(currentOrderBook->buy.begin()+i);
+                        currentOrderBook->sell.erase(currentOrderBook->sell.begin()+j);
+                        
                         matchFound = true;  // Set matchFound to true when a match occurs
                     }
                     
@@ -210,7 +240,7 @@ int main()
             std::string timestamp = getTimestamp();  
 
             //print to .csv file
-            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< "new"<<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<reject<<","<<timestamp<<std::endl;
+            file_out <<orderBookEntry.orderID<<","<<orderBookEntry.ID<<","<<orderBookEntry.instrument<<","<<orderBookEntry.side<<","<< "New"<<","<<orderBookEntry.quantity<<","<<orderBookEntry.price<<","<<reject<<","<<timestamp<<std::endl;
             } 
     }
         //std::cout << line << std::endl;
